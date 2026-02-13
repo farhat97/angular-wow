@@ -1,1 +1,13 @@
-<p>main-dashboard works!</p>
+
+<h1> Home </h1>
+
+<div *ngIf="isLoading">Loading races...</div>
+
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<select class="form-select" aria-label="Select Race">
+  <option selected>Select Playable Race</option>
+  <option *ngFor="let race of playableRaces$ | async" [value]="race.id">{{ race.name }}</option>
+
+</select>
+
