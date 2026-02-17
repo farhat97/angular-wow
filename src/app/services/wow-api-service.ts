@@ -1,8 +1,9 @@
-import { Injectable } from "@angular/core";
+import { computed, DestroyRef, inject, Injectable, Signal, signal } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map, catchError, throwError, race } from 'rxjs';
 import { Race } from "../../shared/types/Race";
 import { BEARER_TOKEN } from "../api-creds";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Injectable({
     providedIn: 'root'
@@ -11,11 +12,26 @@ export class WowApiService {
     private readonly API_BASE_URL = 'https://us.api.blizzard.com';
     private readonly NAMESPACE = 'static-classic-us';
     private readonly LOCALE = 'en_US';
+
+    private readonly destroyRef = inject(DestroyRef);
+    // Approach using signals - keep track of responses with signals
+
+    // Writable signals: mutable by this service only
+    private readonly _playableRaces = signal<Race[]>([ ]);
+    private readonly _isRacesLoading = signal<boolean>(false);
+    private readonly _isRacesError = signal<string | null>(null);
+
+    // Readable signals: exposed to consumers
+    readonly playableRaces = this._playableRaces.asReadonly();
+    readonly isRacesLoading = this._isRacesLoading.asReadonly();
+    readonly isRacesError = this._isRacesError.asReadonly(); 
     
     constructor(private httpClient: HttpClient) {}
 
-
-    getRaces(): Observable<Race[]> {
+    getPlayableRaces(): void {
+        this._isRacesLoading.set(true);
+        // this._isRacesError.set()
+        
         const url = `${this.API_BASE_URL}/data/wow/playable-race/index`;
 
         const params = new HttpParams()
@@ -26,22 +42,25 @@ export class WowApiService {
             'Authorization': `Bearer ${BEARER_TOKEN}`
         });
 
-        return this.httpClient.get<any>(url, { headers, params }).pipe(
-            map((response) => {
-                // TODO: try without map to see what happens
-                return response.races.map((race: any) => ({
-                    id: race.id,
-                    name: race.name
-                }));
-            }),
-            catchError(this.handleError)
-        );
+        // TODO: maybe not use any? 
+        this.httpClient.get<any>(url, { headers, params }).pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe({
+            next: (response) => {
+                console.log('races from subscribe (service) = ', response);
+                this._playableRaces.set(response.races);
+                this._isRacesLoading.set(false);
+            },
+            error: (error) => {
+                console.log('error from subscribe (service)', error);
+                this._isRacesError.set(error.message);
+                this._isRacesLoading.set(false);
+            }
+        });
     }
 
-
-    private handleError(error: any): Observable<never> {
-        console.log('WoW API error =', error);
-        return throwError(() => new Error(error));
+    findRaceById(raceId: number): Race | undefined {
+        return this._playableRaces().find(r => r.id === raceId);
     }
 
 }

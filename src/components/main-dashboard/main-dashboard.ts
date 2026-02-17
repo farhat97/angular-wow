@@ -1,44 +1,42 @@
-import { Component, OnInit } from '@angular/core';
-import { Race } from '../../shared/types/Race';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WowApiService } from '../../app/services/wow-api-service';
-import { Observable, of } from 'rxjs';
+import { UserSelectionStore } from '../../app/store/user-selection-store';
+import { Race } from '../../shared/types/Race';
 
 @Component({
   selector: 'app-main-dashboard',
   imports: [CommonModule],
+  providers: [UserSelectionStore],
   templateUrl: './main-dashboard.html',
   styleUrl: './main-dashboard.css',
 })
 export class MainDashboard implements OnInit {
 
-  playableRaces$: Observable<Race[]> = of([]);
-  isLoading = false;
-  error = '';
+  readonly store = inject(UserSelectionStore);
+  readonly wowApiService = inject(WowApiService);
 
-  constructor(private wowApiService: WowApiService) { }
+  public onSelectRace(event: any): void {
+    const raceId: number = Number(event.target.value);
 
-  ngOnInit(): void {
-    this.loadPlayableRaces();
+    // TODO: this code's Race has ID and name only, but Blizzard's response has a couple extra metadata type things
+    // Because of this, I have to initialize the object before setting the store's state
+    const selectedRace = this.wowApiService.findRaceById(raceId);
+
+    if (selectedRace) {
+      const race: Race = {
+        id: selectedRace.id,
+        name: selectedRace.name
+      };
+      this.store.updateSelectedRace(race);
+    }
+    else
+      console.log('Error - not able to get selected race');
   }
 
-  private loadPlayableRaces(): void {
-    this.isLoading = true;
-
-    this.playableRaces$ = this.wowApiService.getRaces();
-    
-    
-    this.playableRaces$.subscribe({
-      next: (races) => {
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.error = error.errorMessage;
-        this.isLoading = false;
-        console.log('Error fetching races = ', error);
-      }
-    })
-
+  // Signal Approach
+  ngOnInit(): void {
+    this.wowApiService.getPlayableRaces();
   }
 
 }
