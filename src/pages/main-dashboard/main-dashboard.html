@@ -14,3 +14,7 @@
     <option [value]="race.id"> {{ race.name }} </option>
   }
 </select>
+
+@if (store.selectedRace()) {
+  <app-playable-classes />
+}

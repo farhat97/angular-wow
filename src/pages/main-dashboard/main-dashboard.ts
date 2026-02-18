@@ -2,11 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WowApiService } from '../../app/services/wow-api-service';
 import { UserSelectionStore } from '../../app/store/user-selection-store';
-import { Race } from '../../shared/types/Race';
+import { PlayableRace } from '../../shared/types/PlayableRace';
+import { PlayableClasses } from '../../shared/components/playable-classes/playable-classes';
 
 @Component({
   selector: 'app-main-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, PlayableClasses],
   providers: [UserSelectionStore],
   templateUrl: './main-dashboard.html',
   styleUrl: './main-dashboard.css',
@@ -24,7 +25,7 @@ export class MainDashboard implements OnInit {
     const selectedRace = this.wowApiService.findRaceById(raceId);
 
     if (selectedRace) {
-      const race: Race = {
+      const race: PlayableRace = {
         id: selectedRace.id,
         name: selectedRace.name
       };

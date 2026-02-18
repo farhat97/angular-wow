@@ -1,4 +1,4 @@
-export interface Race {
+export interface PlayableRace {
     id: number;
     name: string;
 }
