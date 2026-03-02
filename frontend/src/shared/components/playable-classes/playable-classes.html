@@ -1,0 +1,9 @@
+<h2>Playable Classes </h2>
+
+<!-- @for(class of wowApiService.playableClasses(); track class.id) {
+    <p> class: {{ class.name }} </p>
+} -->
+
+@for(class of store.selectedRaceClasses(); track class.id) {
+    <p> class: {{ class.name }} </p>
+}
