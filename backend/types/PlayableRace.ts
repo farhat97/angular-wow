@@ -1,8 +1,10 @@
-import { PlayableClassIndex } from "./PlayableClass";
+import type { KeyReference } from "./KeyReference";
+import type { PlayableClassIndex } from "./PlayableClass";
 
 export interface PlayableRaceIndex {
   id: number;
   name: string;
+  key: KeyReference;
 }
 
 export interface PlayableRace {
@@ -28,12 +30,8 @@ export interface Faction {
 
 // TODO: revise
 export interface NamedApiResource {
-  key: ApiKey;
+  key: KeyReference;
   name: string;
   id: number;
-}
-
-export interface ApiKey {
-  href: string;
 }
 

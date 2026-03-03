@@ -146,9 +146,4 @@ export class WowApiService {
     findRaceById(raceId: number): PlayableRaceIndex | undefined {
         return this._racesState().data?.find(r => r.id === raceId);
     }
-
-    // getPlayableClassesByRace(raceId: number): PlayableClass[] | undefined {
-    //     return this._classesState().data?.filter(c => c.)
-    // }
-
 }

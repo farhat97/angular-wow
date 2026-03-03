@@ -1,6 +1,9 @@
 # dependencies (bun install)
 node_modules
 
+# Secrets
+/api-creds.ts
+
 # output
 out
 dist
