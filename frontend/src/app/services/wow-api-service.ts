@@ -2,7 +2,7 @@ import { computed, DestroyRef, inject, Injectable, Signal, signal } from "@angul
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { PlayableRace, PlayableRaceIndex } from "../../shared/types/PlayableRace";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { PlayableClass } from "../../shared/types/PlayableClass";
+import { PlayableClass, PlayableClassView } from "../../shared/types/PlayableClass";
 import { Observable } from "rxjs";
 
 export interface ApiState<T> {
@@ -23,7 +23,7 @@ export class WowApiService {
         loading: false,
         error: null
     });
-    private readonly _classesState = signal<ApiState<PlayableClass[]>>({
+    private readonly _classesState = signal<ApiState<PlayableClassView[]>>({
         data: null,
         loading: false,
         error: null
@@ -97,6 +97,12 @@ export class WowApiService {
                 });
             }
         });
+    }
+
+    getPlayableClassesByRace(raceId: number): Observable<PlayableClassView[]> {
+        const url = `/api/playable-race/${raceId}/playable-classes`;
+
+        return this.httpClient.get<any>(url);
     }
 
     getPlayableClassById(classId: number): Observable<PlayableClass> {

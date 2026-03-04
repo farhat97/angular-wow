@@ -1,0 +1,12 @@
+<div>
+    @if (playableClass != null) {
+        <div class="card shadow-sm">
+            <div class="card-body class-card px-30">
+                <img class="class-image mb-2" [src]="playableClass.media_url" />
+                <div class="class-name mb-0">
+                    {{ playableClass.name }}
+                </div>
+            </div>
+        </div>
+    }
+</div>

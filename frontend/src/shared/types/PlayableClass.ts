@@ -13,6 +13,13 @@ export interface PlayableClass {
   pvp_talent_slots: PvpTalentSlots;
 }
 
+export interface PlayableClassView {
+  id: number;
+  name: string;
+  power_type: PowerType;
+  media_url: string | null;
+}
+
 export interface GenderName {
   male: string;
   female: string;

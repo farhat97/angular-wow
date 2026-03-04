@@ -1,9 +1,12 @@
-<h2>Playable Classes </h2>
+<div class="classes-container">
+    <h2>Playable Classes </h2>
+    
+    <div class="row">
+        @for(class of store.selectedRaceClasses(); track class.id) {
+            <div class="col-12 col-md-4 mb-4">
+                <app-playable-class [playableClass]="class" />
+            </div>
+        }
+    </div>
+</div>
 
-<!-- @for(class of wowApiService.playableClasses(); track class.id) {
-    <p> class: {{ class.name }} </p>
-} -->
-
-@for(class of store.selectedRaceClasses(); track class.id) {
-    <p> class: {{ class.name }} </p>
-}
