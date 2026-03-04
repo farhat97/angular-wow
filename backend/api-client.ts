@@ -1,3 +1,8 @@
+import { BEARER_TOKEN } from './api-creds';
+import axios from 'axios';
+import type { PlayableRaceIndex, PlayableRace } from './types/PlayableRace';
+import type { PlayableClass, PlayableClassMedia, PlayableClassView } from './types/PlayableClass';
+
 const API_BASE_URL = 'https://us.api.blizzard.com';
 const NAMESPACE = 'static-classic-us';
 const LOCALE = 'en_US';
@@ -10,33 +15,28 @@ const headers = {
   'Authorization': `Bearer ${BEARER_TOKEN}`
 };
 
-import { BEARER_TOKEN } from './api-creds';
-import axios from 'axios';
-import type { PlayableRaceIndex, PlayableRace } from './types/PlayableRace';
-import type { PlayableClass, PlayableClassMedia, PlayableClassView } from './types/PlayableClass';
-
 export async function getPlayableRaces(): Promise<PlayableRaceIndex[]> {
-    
-    const response = await fetch(
-      `${API_BASE_URL}/data/wow/playable-race/index?namespace=${NAMESPACE}&locale=${LOCALE}`, {
-          headers: {
-              "Authorization": `Bearer ${BEARER_TOKEN}`
-          }
-      }
-    );
-    
-    const data: any = await response.json();
-    
-    return data.races.map((race: any) => ({
-      id: race.id,
-      name: race.name
-    }));
+  
+  const response = await axios.get<any>(
+    `${API_BASE_URL}/data/wow/playable-race/index?namespace=${NAMESPACE}&locale=${LOCALE}`, {
+        headers: {
+            "Authorization": `Bearer ${BEARER_TOKEN}`
+        }
+    }
+  );
+  
+  console.log('Playable races = ', response.data.races.length);
+
+  return response.data.races.map((race: any) => ({
+    id: race.id,
+    name: race.name
+  }));
 }
 
 export async function getPlayableRace(raceId: number): Promise<PlayableRace> {
 
   const response = await axios.get<PlayableRace>(`${API_BASE_URL}/data/wow/playable-race/${raceId}`, { headers, params });
-  console.log('Playable Race = ', response.data);
+  console.log('Playable Race = ', response.data.name);
 
   // TODO: handle errors?
   return response.data;
@@ -45,7 +45,7 @@ export async function getPlayableRace(raceId: number): Promise<PlayableRace> {
 export async function getPlayableClassById(classId: number): Promise<PlayableClass> {
   const response = await axios.get<PlayableClass>(`${API_BASE_URL}/data/wow/playable-class/${classId}`, { headers, params });
 
-  console.log('Playable Class = ', response.data);
+  console.log('Playable Class = ', response.data.name);
 
   return response.data;
 }

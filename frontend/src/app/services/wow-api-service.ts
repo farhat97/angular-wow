@@ -1,10 +1,9 @@
 import { computed, DestroyRef, inject, Injectable, Signal, signal } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { PlayableRace, PlayableRaceIndex } from "../../shared/types/PlayableRace";
-import { BEARER_TOKEN } from "../api-creds";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { PlayableClass } from "../../shared/types/PlayableClass";
-import { map, Observable } from "rxjs";
+import { Observable } from "rxjs";
 
 export interface ApiState<T> {
     data: T | null;
@@ -16,9 +15,6 @@ export interface ApiState<T> {
     providedIn: 'root'
 })
 export class WowApiService {
-    private readonly API_BASE_URL = 'https://us.api.blizzard.com';
-    private readonly NAMESPACE = 'static-classic-us';
-    private readonly LOCALE = 'en_US';
 
     private readonly destroyRef = inject(DestroyRef);
     // Approach using signals - keep track of responses with signals
@@ -47,24 +43,15 @@ export class WowApiService {
     getPlayableRaces(): void {
         this._racesState.set({ data: null, loading: true, error: null });
         
-        const url = `${this.API_BASE_URL}/data/wow/playable-race/index`;
+        const url = `/api/playable-race/index`;
 
-        const params = new HttpParams()
-            .set('namespace', this.NAMESPACE)
-            .set('locale', this.LOCALE);
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${BEARER_TOKEN}`
-        });
-
-        // TODO: maybe not use any? 
-        this.httpClient.get<any>(url, { headers, params }).pipe(
+        this.httpClient.get<any>(url).pipe(
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
             next: (response) => {
                 console.log('races from subscribe (service) = ', response);
                 this._racesState.set({
-                    data: response.races,
+                    data: response,
                     loading: false,
                     error: null
                 });
@@ -74,46 +61,29 @@ export class WowApiService {
                 this._racesState.set({
                     data: null,
                     loading: false,
-                    error: error.errorMessage
+                    error: error.message
                 });
             }
         });
     }
 
     getSelectedPlayableRace(raceId: number): Observable<PlayableRace> {
-
-        const url = `${this.API_BASE_URL}/data/wow/playable-race/${raceId}`;
+        const url = `/api/playable-race/${raceId}`;
         
-        const params = new HttpParams()
-            .set('namespace', this.NAMESPACE)
-            .set('locale', this.LOCALE);
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${BEARER_TOKEN}`
-        });
-
-        return this.httpClient.get<PlayableRace>(url, { headers, params });
+        return this.httpClient.get<PlayableRace>(url);
     }
 
 
     getPlayableClasses(): void {
-        const url = `${this.API_BASE_URL}/data/wow/playable-class/index`;
+        const url = `/api/playable-class/index`;
 
-        const params = new HttpParams()
-            .set('namespace', this.NAMESPACE)
-            .set('locale', this.LOCALE);
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${BEARER_TOKEN}`
-        });
-
-        this.httpClient.get<any>(url, { headers, params }).pipe(
+        this.httpClient.get<any>(url).pipe(
             takeUntilDestroyed(this.destroyRef)
         ).subscribe({
             next: (response) => {
                 console.log('classes from subscribe (service) = ', response);
                 this._classesState.set({
-                    data: response.classes,
+                    data: response,
                     loading: false,
                     error: null
                 });
@@ -123,24 +93,16 @@ export class WowApiService {
                 this._classesState.set({
                     data: null,
                     loading: false,
-                    error: error.errorMessage
+                    error: error.message
                 });
             }
         });
     }
 
     getPlayableClassById(classId: number): Observable<PlayableClass> {
-        const url = `${this.API_BASE_URL}/data/wow/playable-class/${classId}`;
-
-        const params = new HttpParams()
-            .set('namespace', this.NAMESPACE)
-            .set('locale', this.LOCALE);
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${BEARER_TOKEN}`
-        });
-
-        return this.httpClient.get<any>(url, { headers, params });
+        const url = `/api/playable-class/${classId}`;
+        
+        return this.httpClient.get<any>(url);
     }
 
     findRaceById(raceId: number): PlayableRaceIndex | undefined {

@@ -27,16 +27,6 @@ export class MainDashboard implements OnInit {
         console.log('Error - not able to get selected race');
       }
     });
-
-    // if (selectedRace) {
-    //   const race: PlayableRaceIndex = {
-    //     id: selectedRace.id,
-    //     name: selectedRace.name
-    //   };
-    //   this.store.updateSelectedRace(race);
-    // }
-    // else
-    //   console.log('Error - not able to get selected race');
   }
 
   // Signal Approach
